@@ -17,6 +17,7 @@ class TsadraFormatter(BaseFormatter):
         self.base_text = ''
         self.walker = 0 # The walker to traverse every character in the pecha
         self.book_title = [] # list variable to store book title index
+        self.book_number = [] # list variable to store book number index
         self.author = [] # list variable to store author annotion index
         self.chapter = [] # list variable to store chapter annotation index
         self.root_text = [] # list variable to store root text index
@@ -39,6 +40,14 @@ class TsadraFormatter(BaseFormatter):
                 Book_title['span']['start'] = layers[layer][0][0]
                 Book_title['span']['end'] = layers[layer][0][1]
                 Book_title_layer['annotations'].append(Book_title)
+            elif layer == 'book_number':
+                Book_number_layer = deepcopy(Layer)
+                Book_number_layer['id'] = self.get_unique_id()
+                Book_number_layer['annotation_type'] = 'book_number'
+                Book_number_layer['revision'] = f'{1:05}'
+                Book_number['span']['start'] = layers[layer][0][0]
+                Book_number['span']['end'] = layers[layer][0][1]
+                Book_number_layer['annotations'].append(Book_number)
             elif layer == 'author':
                 Author_layer = deepcopy(Layer)
                 Author_layer['id'] = self.get_unique_id()
@@ -107,6 +116,7 @@ class TsadraFormatter(BaseFormatter):
         
         result = {
             'book_title': Book_title_layer,
+            'book_number': Book_number_layer,
             'author': Author_layer,
             'chapter_title': Chapter_layer,
             'tsawa': Tsawa_layer,
@@ -124,6 +134,7 @@ class TsadraFormatter(BaseFormatter):
         '''
         soup = BeautifulSoup(html, 'html.parser')
         book_title_tmp = ''
+        book_number_tmp = ''
         author_tmp = ''
         chapter_title_tmp = ''
         root_text_tmp = ''
@@ -158,6 +169,12 @@ class TsadraFormatter(BaseFormatter):
                 self.book_title.append((self.walker, len(book_title_tmp)-2+self.walker))
                 self.base_text += book_title_tmp
                 self.walker += len(book_title_tmp)
+            
+            if 'book-number' in  p['class'][0]: # to get the book title index
+                book_number_tmp = self.text_preprocess(p.text) + '\n'
+                self.book_number.append((self.walker, len(book_number_tmp)-2+self.walker))
+                self.base_text += book_number_tmp
+                self.walker += len(book_number_tmp)
 
             if 'text-author' in p['class'][0]: # to get the author annotation index
                 author_tmp = self.text_preprocess(p.text) + '\n'
@@ -303,6 +320,7 @@ class TsadraFormatter(BaseFormatter):
         '''
         result = {
             'book_title': self.book_title,
+            'book_number': self.book_number,
             'author': self.author,
             'chapter_title': self.chapter,
             'tsawa': self.root_text,
@@ -384,3 +402,9 @@ class TsadraFormatter(BaseFormatter):
         for layer, ann in self.format_layer(layers).items():
             layer_fn = vol_layer_path/f'{layer}.yml'
             self.dump(ann, layer_fn)
+
+
+if __name__ == '__main__':
+    path = 'bo_crawler/bo_crawler/parsers/data/tsadra/RDI-SS-05/OEBPS'
+    formatter = TsadraFormatter()
+    formatter.create_opf(path,1)

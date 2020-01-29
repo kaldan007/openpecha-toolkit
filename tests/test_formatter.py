@@ -105,6 +105,7 @@ class TestTsadraFormatter:
        
         expected_result = {
             'book_title':[(0,84)],
+            'book_number':[],
             'author':[(86,109),(111,134),(136,181)],
             'chapter_title':[(183,200)],
             'tsawa':[(4150,4300),(5122,5298)],

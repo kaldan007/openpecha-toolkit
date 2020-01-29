@@ -8,7 +8,7 @@ from collections import namedtuple
 __all__ = [
     'Layer', 'Page', 'Text', 'Correction', 'ErrorCandidate', 'CrossVolSpan',
     'SubText', 'Peydurma', 'Chapter', 'Tsawa', 'Quotation', 'Sabche', 'Yigchung',
-    'Book_title', 'Author']
+    'Book_title', 'Book_number', 'Author']
 
 # General layer format
 Layer = {
@@ -74,8 +74,9 @@ Peydurma = {
     'span': Span
 }
 
-# Book titlle and author
+# Book titlle, number and author
 Book_title = {'span': Span}
+Book_number = {'span': Span}
 Author = {'span': Span}
 
 # Chapter
